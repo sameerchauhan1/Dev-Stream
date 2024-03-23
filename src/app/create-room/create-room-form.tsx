@@ -15,25 +15,33 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { createRoomAction } from "./actions";
 
 const formSchema = z.object({
    name: z.string().min(1).max(50),
    description: z.string().min(1).max(50),
+   githubRepo: z.string().min(1).max(50),
+   language: z.string().min(1).max(50),
 });
 
 export function CreateRoomForm() {
+   const route = useRouter();
+
    const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
          name: "",
          description: "",
+         githubRepo: "",
+         language: "",
       },
    });
 
-   function onSubmit(values: z.infer<typeof formSchema>) {
-      // Do something with the form values.
-      // ✅ This will be type-safe and validated.
-      console.log(values);
+   async function onSubmit(values: z.infer<typeof formSchema>) {
+      // TODO: invoke a server action to store the data in our database
+      await createRoomAction(values);
+      route.push("/");
    }
 
    return (
@@ -65,7 +73,40 @@ export function CreateRoomForm() {
                         <Input {...field} />
                      </FormControl>
                      <FormDescription>
-                        Please describw about your room.
+                        Please describe about your room.
+                     </FormDescription>
+                     <FormMessage />
+                  </FormItem>
+               )}
+            />
+            <FormField
+               control={form.control}
+               name="githubRepo"
+               render={({ field }) => (
+                  <FormItem>
+                     <FormLabel>Github Repository</FormLabel>
+                     <FormControl>
+                        <Input {...field} />
+                     </FormControl>
+                     <FormDescription>
+                        Please put a link to a project you are working on.
+                     </FormDescription>
+                     <FormMessage />
+                  </FormItem>
+               )}
+            />
+            <FormField
+               control={form.control}
+               name="language"
+               render={({ field }) => (
+                  <FormItem>
+                     <FormLabel> Primary programming languages</FormLabel>
+                     <FormControl>
+                        <Input {...field} />
+                     </FormControl>
+                     <FormDescription>
+                        List the primary programming language you are working
+                        with.
                      </FormDescription>
                      <FormMessage />
                   </FormItem>
